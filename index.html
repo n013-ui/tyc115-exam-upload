@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>115試模擬測驗　應考表件上傳</title>
+<style>
+  :root {
+    --ink: #1c2733; --muted: #5b6875; --line: #d5dce3; --bg: #f3f6f9;
+    --card: #ffffff; --brand: #1f4e79; --brand-dark: #173b5c;
+    --ok: #1e7a46; --ok-bg: #e8f5ec; --warn: #8a5300; --warn-bg: #fff5e0;
+    --err: #b3261e; --err-bg: #fdecea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.65 "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  }
+  header { background: var(--brand); color: #fff; padding: 28px 16px 24px; }
+  header .in, main { max-width: 680px; margin: 0 auto; }
+  header p { margin: 0; opacity: .85; font-size: 14px; letter-spacing: .05em; }
+  header h1 { margin: 4px 0 0; font-size: 24px; line-height: 1.35; }
+  main { padding: 20px 16px 48px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .card h2 .req { color: var(--err); font-size: 13px; font-weight: 600; margin-left: 6px; }
+  .card h2 .opt { color: var(--muted); font-size: 13px; font-weight: 600; margin-left: 6px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  label.f { display: block; font-weight: 600; margin: 14px 0 4px; }
+  label.f small { font-weight: 400; color: var(--muted); }
+  input[type=text], input[type=tel] {
+    width: 100%; padding: 10px 12px; font: inherit; color: inherit;
+    border: 1px solid #aab4bf; border-radius: 6px; background: #fff;
+  }
+  input:focus-visible, button:focus-visible, .drop:focus-within {
+    outline: 3px solid #7fb0dc; outline-offset: 1px;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+
+  .drop {
+    display: block; position: relative; border: 2px dashed #9fb0c0; border-radius: 8px;
+    padding: 16px; text-align: center; cursor: pointer; background: #fafcfd;
+  }
+  .drop.over { border-color: var(--brand); background: #eaf2f9; }
+  .drop.has { border-style: solid; border-color: var(--ok); background: var(--ok-bg); text-align: left; }
+  .drop input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .drop b { color: var(--brand); }
+  .drop .picked { word-break: break-all; }
+  .drop .picked span { color: var(--muted); font-size: 13px; }
+
+  .choices { display: grid; gap: 8px; margin-top: 4px; }
+  .choices label {
+    display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 6px; cursor: pointer;
+  }
+  .choices input { margin-top: 6px; }
+  .choices label:has(input:checked) { border-color: var(--brand); background: #eaf2f9; }
+  .note {
+    background: var(--warn-bg); color: var(--warn); border-radius: 6px;
+    padding: 10px 12px; font-size: 14px; margin: 12px 0;
+  }
+  [hidden] { display: none !important; }
+
+  button.go {
+    width: 100%; padding: 14px; font: inherit; font-size: 18px; font-weight: 700;
+    color: #fff; background: var(--brand); border: 0; border-radius: 8px; cursor: pointer;
+  }
+  button.go:hover { background: var(--brand-dark); }
+  button.go:disabled { background: #8b9aa8; cursor: wait; }
+  .msg { border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; }
+  .msg.err { background: var(--err-bg); color: var(--err); }
+  .msg.busy { background: #eaf2f9; color: var(--brand-dark); }
+  .done { border-color: var(--ok); }
+  .done h2 { color: var(--ok); font-size: 22px; }
+  .done ul { padding-left: 20px; word-break: break-all; }
+  .done button { font: inherit; padding: 8px 16px; border: 1px solid #aab4bf; border-radius: 6px; background: #fff; cursor: pointer; }
+  footer { color: var(--muted); font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+<header><div class="in">
+  <p>桃連區115學年度高級中等學校免試入學</p>
+  <h1>試模擬測驗　應考表件上傳</h1>
+</div></header>
+
+<main>
+  <form id="form" novalidate>
+    <div class="card">
+      <h2>學校資料</h2>
+      <div class="row">
+        <div>
+          <label class="f" for="code">學校代碼 <small>（6 碼數字）</small></label>
+          <input type="text" id="code" inputmode="numeric" maxlength="6" placeholder="例：034506" autocomplete="off" required>
+        </div>
+        <div>
+          <label class="f" for="name">學校名稱</label>
+          <input type="text" id="name" maxlength="40" placeholder="例：南崁國中" required>
+        </div>
+        <div>
+          <label class="f" for="contact">承辦人 <small>（選填）</small></label>
+          <input type="text" id="contact" maxlength="30">
+        </div>
+        <div>
+          <label class="f" for="phone">聯絡電話 <small>（選填）</small></label>
+          <input type="tel" id="phone" maxlength="30" placeholder="含分機">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>表件 1　學校基本資料<span class="req">必傳</span></h2>
+      <p class="hint">請上傳填寫完成的 Word 檔（.docx）。</p>
+      <label class="drop" data-kind="basic">
+        <input type="file" accept=".docx,.doc">
+        <span class="empty"><b>點此選擇檔案</b>，或把檔案拖曳到這裡</span>
+        <span class="picked" hidden></span>
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>表件 2　學生名冊<span class="req">必傳</span></h2>
+      <p class="hint">請上傳受測學生名單 Excel 檔（.xlsx），含特殊應考服務學生名單分頁。</p>
+      <label class="drop" data-kind="roster">
+        <input type="file" accept=".xlsx,.xls">
+        <span class="empty"><b>點此選擇檔案</b>，或把檔案拖曳到這裡</span>
+        <span class="picked" hidden></span>
+      </label>
+    </div>
+
+    <div class="card">
+      <h2>學生姓名造字申請表<span class="opt">無則免附</span></h2>
+      <div class="choices">
+        <label><input type="radio" name="glyph" value="none" checked><span>本校沒有造字需求</span></label>
+        <label><input type="radio" name="glyph" value="upload"><span>在這裡上傳造字申請表</span></label>
+        <label><input type="radio" name="glyph" value="fax"><span>自行傳真至康軒　傳真電話 (02)3322-8781</span></label>
+      </div>
+      <div id="glyphBox" hidden>
+        <div class="note">請上傳 <b>PDF 或照片檔</b>（jpg、png），不要傳 Excel 或 Word 原始檔，以免造字在別台電腦上掉字、變成空白或問號。</div>
+        <label class="drop" data-kind="glyph">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,application/pdf,image/*" multiple>
+          <span class="empty"><b>點此選擇檔案</b>，或把檔案拖曳到這裡（照片可一次選多張）</span>
+          <span class="picked" hidden></span>
+        </label>
+      </div>
+    </div>
+
+    <div id="msg" class="msg" role="alert" hidden></div>
+    <button class="go" id="go" type="submit">送出上傳</button>
+  </form>
+
+  <div class="card done" id="done" hidden>
+    <h2>✔ 上傳完成</h2>
+    <p><b id="doneSchool"></b>　<span id="doneTime"></span></p>
+    <p style="margin-bottom:0">已收到以下檔案：</p>
+    <ul id="doneFiles"></ul>
+    <p id="doneFax" class="note" hidden>別忘了將造字申請表傳真至康軒：(02)3322-8781。</p>
+    <p class="hint">建議將此畫面截圖留存。資料若需更正，重新上傳一次即可，以最後一次上傳為準。</p>
+    <button type="button" onclick="location.reload()">再上傳一次</button>
+  </div>
+
+  <footer>
+    <p>上傳之檔案含學生個人資料，僅供本次試模擬測驗試務作業使用。<br>
+    每個檔案上限 15MB。廠商聯絡電話 (02)2918-9393 分機 752、231</p>
+  </footer>
+</main>
+
+<script>
+// Apps Script 網頁應用程式網址（部署後填入）
+const ENDPOINT = '__ENDPOINT__';
+const MAX = 15 * 1024 * 1024;
+const RULES = {
+  basic:  { label: '學校基本資料', ext: ['docx', 'doc'] },
+  roster: { label: '學生名冊', ext: ['xlsx', 'xls'] },
+  glyph:  { label: '造字申請表', ext: ['pdf', 'jpg', 'jpeg', 'png', 'heic'] }
+};
+const picked = { basic: [], roster: [], glyph: [] };
+const $ = id => document.getElementById(id);
+const msg = $('msg');
+
+function show(kind, text) {
+  msg.className = 'msg ' + kind; msg.textContent = text; msg.hidden = false;
+  msg.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+const size = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.ceil(n / 1024) + ' KB';
+const ext = f => f.name.split('.').pop().toLowerCase();
+
+function setFiles(kind, list) {
+  const rule = RULES[kind];
+  const drop = document.querySelector(`.drop[data-kind=${kind}]`);
+  let files = [...list];
+  if (kind !== 'glyph') files = files.slice(0, 1);
+  const bad = files.find(f => !rule.ext.includes(ext(f)));
+  const big = files.find(f => f.size > MAX);
+  if (bad || big || files.length > 10) {
+    show('err', bad ? `「${rule.label}」請上傳 ${rule.ext.join('、')} 檔，您選的是「${bad.name}」。`
+      : big ? `「${big.name}」超過 15MB，請壓縮後再上傳。` : '造字申請表最多 10 個檔案。');
+    files = [];
+  } else { msg.hidden = true; }
+  picked[kind] = files;
+  drop.classList.toggle('has', files.length > 0);
+  drop.querySelector('.empty').hidden = files.length > 0;
+  const p = drop.querySelector('.picked');
+  p.hidden = files.length === 0;
+  p.replaceChildren(...files.flatMap(f => {
+    const s = document.createElement('span'); s.textContent = `　${size(f.size)}`;
+    return ['✔ ' + f.name, s, document.createElement('br')];
+  }));
+}
+
+document.querySelectorAll('.drop').forEach(drop => {
+  const kind = drop.dataset.kind, input = drop.querySelector('input');
+  input.addEventListener('change', () => setFiles(kind, input.files));
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('over')));
+  drop.addEventListener('drop', e => { e.preventDefault(); setFiles(kind, e.dataTransfer.files); });
+});
+
+const glyphMode = () => document.querySelector('input[name=glyph]:checked').value;
+document.querySelectorAll('input[name=glyph]').forEach(r =>
+  r.addEventListener('change', () => { $('glyphBox').hidden = glyphMode() !== 'upload'; }));
+$('code').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+
+const toBase64 = file => new Promise((ok, fail) => {
+  const r = new FileReader();
+  r.onload = () => ok(r.result.slice(r.result.indexOf(',') + 1));
+  r.onerror = () => fail(new Error('無法讀取檔案：' + file.name));
+  r.readAsDataURL(file);
+});
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const code = $('code').value.trim(), name = $('name').value.trim(), mode = glyphMode();
+  if (!/^\d{6}$/.test(code)) return show('err', '請填寫 6 碼數字的學校代碼。'), $('code').focus();
+  if (!name) return show('err', '請填寫學校名稱。'), $('name').focus();
+  if (!picked.basic.length) return show('err', '請選擇表件 1「學校基本資料」的 docx 檔。');
+  if (!picked.roster.length) return show('err', '請選擇表件 2「學生名冊」的 xlsx 檔。');
+  if (mode === 'upload' && !picked.glyph.length) return show('err', '請選擇造字申請表的 PDF 或照片檔，或改選其他選項。');
+
+  const go = $('go');
+  go.disabled = true; go.textContent = '上傳中，請勿關閉視窗…';
+  show('busy', '檔案上傳中，約需 10～30 秒，請稍候。');
+  try {
+    const files = [];
+    for (const kind of ['basic', 'roster', ...(mode === 'upload' ? ['glyph'] : [])]) {
+      for (const f of picked[kind]) files.push({ kind, name: f.name, mime: f.type, data: await toBase64(f) });
+    }
+    // 不設定 Content-Type，讓瀏覽器以 text/plain 送出，避免跨網域預檢請求
+    const res = await fetch(ENDPOINT, {
+      method: 'POST', redirect: 'follow',
+      body: JSON.stringify({ schoolCode: code, schoolName: name, contact: $('contact').value, phone: $('phone').value, glyphMode: mode, files })
+    });
+    const out = await res.json();
+    if (!out.ok) throw new Error(out.error || '伺服器未回應成功');
+    $('form').hidden = true;
+    $('doneSchool').textContent = `${code} ${name}`;
+    $('doneTime').textContent = out.time;
+    $('doneFiles').replaceChildren(...out.files.map(n => Object.assign(document.createElement('li'), { textContent: n })));
+    $('doneFax').hidden = mode !== 'fax';
+    $('done').hidden = false;
+    window.scrollTo({ top: 0 });
+  } catch (err) {
+    const net = err instanceof TypeError || err instanceof SyntaxError;
+    show('err', '上傳失敗：' + (net ? '連線中斷或伺服器忙碌，請稍後再按一次「送出上傳」。' : err.message));
+    go.disabled = false; go.textContent = '送出上傳';
+  }
+});
+</script>
+</body>
+</html>
