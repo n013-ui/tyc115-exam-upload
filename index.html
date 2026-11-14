@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; form-action 'none'; base-uri 'none'">
 <title>115試模擬測驗　應考表件上傳</title>
 <style>
   :root {
@@ -116,7 +118,7 @@
       <h2>表件 1　學校基本資料<span class="req">必傳</span></h2>
       <p class="hint">請上傳填寫完成的 Word 檔（.docx）。</p>
       <label class="drop" data-kind="basic">
-        <input type="file" accept=".docx,.doc">
+        <input type="file" accept=".docx">
         <span class="empty"><b>點此選擇檔案</b>，或把檔案拖曳到這裡</span>
         <span class="picked" hidden></span>
       </label>
@@ -126,7 +128,7 @@
       <h2>表件 2　學生名冊<span class="req">必傳</span></h2>
       <p class="hint">請上傳受測學生名單 Excel 檔（.xlsx），含特殊應考服務學生名單分頁。</p>
       <label class="drop" data-kind="roster">
-        <input type="file" accept=".xlsx,.xls">
+        <input type="file" accept=".xlsx">
         <span class="empty"><b>點此選擇檔案</b>，或把檔案拖曳到這裡</span>
         <span class="picked" hidden></span>
       </label>
@@ -174,8 +176,8 @@
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyjA8mxrXVmRgFIMZtrLPpiVzamTk2XUV2u0bskPMYj3dNx_THMQ_tlrzUtpSsgkPRM/exec';
 const MAX = 15 * 1024 * 1024;
 const RULES = {
-  basic:  { label: '學校基本資料', ext: ['docx', 'doc'] },
-  roster: { label: '學生名冊', ext: ['xlsx', 'xls'] },
+  basic:  { label: '學校基本資料', ext: ['docx'] },
+  roster: { label: '學生名冊', ext: ['xlsx'] },
   glyph:  { label: '造字申請表', ext: ['pdf', 'jpg', 'jpeg', 'png', 'heic'] }
 };
 const picked = { basic: [], roster: [], glyph: [] };
